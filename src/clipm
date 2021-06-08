@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# checking if the dependencies are installed on the system
+bash -c "gpg --version 1> /dev/null 2> /dev/null" || echo "ERROR: gpg is missing"; exit=yes
+bash -c "sqlite3 -version  1> /dev/null 2> /dev/null" || echo "ERROR: sqlite3 is missing"; exit=yes
+bash -c "pwgen 0 1> /dev/null 2> /dev/null" || echo "ERROR: pwgen is missing"; exit=yes
+
+if [ $exit == "yes" ] ; then exit ; fi
+
+home=$HOME/.local/share/clipm/
+init(){
+#{{{
+    mkdir -p $home
+    echo "create table if not exists accounts \
+    ( id integer primary key autoincrement, username text,password text,email text,additional text)" \
+    | sqlite3 $home/accounts.sqlite
+    read -p "choose the gpg key you want to be used: " gpgKey
+    echo gpgKey=$gpgKey > $home/config
+#}}}
+}
+
+[ ! -d $home ] && init
+[ ! -f $home/config ] && init
+source $home/config
+
+#add(){}
+#remove(){}
+#edit(){}
+
+$1
+# vim: fdm=marker:fdl=1
